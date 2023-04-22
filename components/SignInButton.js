@@ -24,9 +24,9 @@ const styles = StyleSheet.create({
     },
 });
 
-const SignInButton = ({ navigation, title }) => {
+const SignInButton = ({ title }) => {
     return (
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Main")}>
+        <TouchableOpacity style={styles.button} >
             <Text style={styles.text}>{title}</Text>
         </TouchableOpacity>
     )

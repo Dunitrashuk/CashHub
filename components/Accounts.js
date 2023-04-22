@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import AccountCard from './AccountCard';
 import Icon from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
+import { openBrowserAsync } from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 
 
 const cards = [
@@ -36,17 +39,55 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 255, 255, 1)',
         opacity: 0.5,
         borderRadius: 15,
+    },
+
+    addFirstBankContainer: {
+        display: "flex",
+        marginLeft: 20,
+        marginRight: 20,
+        height: 130,
+        width: width,
+        backgroundColor: 'grey',
+        opacity: 0.8,
+        borderRadius: 15,
+        padding: 15,
+        justifyContent: "space-around",
+        alignItems: "center",
     }
 
 });
 
 const { width } = Dimensions.get('window');
 
+
+function addBankAccount() {
+
+    axios.post('https://guam-null-grew-cocktail.trycloudflare.com/api/connect/connect')
+        .then(response => {
+            let url = response.data.connect_url;
+            Linking.openURL(url)
+        })
+        .catch(error => {
+            Alert.alert(
+                'Error',
+                'Could not connect to API',
+                [
+                    {
+                        text: 'Try Again',
+                        style: 'cancel',
+                    },
+                ],
+            );
+        });
+
+
+}
+
 export default function Accounts(props) {
     return (
         <View>
             <Text style={styles.title}>Accounts</Text>
-            <FlatList
+            {/* <FlatList
                 data={cards}
                 keyExtractor={(item => item.key)}
                 horizontal
@@ -59,7 +100,13 @@ export default function Accounts(props) {
                 renderItem={({ item }) => {
                     return <AccountCard bank={item.bank} balance={item.balance} />
                 }}
-            />
+            /> */}
+            <View style={styles.addFirstBankContainer}>
+                <Text style={{ color: "#D6D6D6", fontWeight: "500" }}>Add your first bank account</Text>
+                <TouchableOpacity onPress={addBankAccount}>
+                    <Icon name={"add-circle-outline"} size={50} color={"#7DA747"} />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
