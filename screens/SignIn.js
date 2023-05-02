@@ -1,10 +1,15 @@
 import React from 'react';
 import { useState } from 'react';
-import { Text, StyleSheet, View, TextInput, Image } from 'react-native';
+import { Text, StyleSheet, View, TextInput, Image, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import axios from 'axios';
+import { BASE_URL } from '@env'
+import Constants from 'expo-constants';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../redux/slices/userSlice';
+import { store } from '../redux/store';
 
 const styles = StyleSheet.create({
     container: {
@@ -91,11 +96,41 @@ let schema = yup.object().shape({
     password: yup.string().required("Password is required"),
 })
 
+function handleSignIn(values, navigation, dispatch) {
+    axios.post(`${BASE_URL}/api/auth/sign_in`, {
+        email: values.email,
+        password: values.password
+    })
+        .then(response => {
+            Constants.manifest.extra.TOKEN = response.data.token
+            dispatch(setUser({
+                name: response.data.name,
+                email: values.email,
+                isSignedIn: true
+            }))
+            console.log(response)
+            navigation.navigate("Main")
+        })
+        .catch(error => {
+            Alert.alert(
+                'Error',
+                'Incorect credentials',
+                [
+                    {
+                        text: 'Try Again',
+                        style: 'cancel',
+                    },
+                ],
+            );
+            console.log(error)
+        });
+
+}
+
 const SignIn = ({ navigation }) => {
 
-    // const [username, setUsername] = useState('');
-    // const [password, setPassword] = useState('');
-    // console.log(username)
+    const dispatch = useDispatch();
+    console.log(store.getState())
 
     return (
         <View style={styles.container}>
@@ -105,9 +140,9 @@ const SignIn = ({ navigation }) => {
 
 
             <Formik
-                initialValues={{ name: "", email: "", password: "", confirmPassword: "" }}
+                initialValues={{ email: "", password: "" }}
                 validateOnMount={true}
-                onSubmit={values => handleSignUp(values, navigation)}
+                onSubmit={values => handleSignIn(values, navigation, dispatch)}
                 validationSchema={schema}
             >
 

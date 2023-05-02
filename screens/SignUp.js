@@ -2,10 +2,10 @@ import React from 'react';
 import { useState } from 'react';
 import { Text, StyleSheet, View, TextInput, Alert, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import SignInButton from '../components/SignInButton';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import axios from 'axios';
+import { BASE_URL } from '@env'
 
 const styles = StyleSheet.create({
     container: {
@@ -88,14 +88,13 @@ const styles = StyleSheet.create({
 
 
 function handleSignUp(values, navigation) {
-    axios.post('https://upc-reports-dig-midlands.trycloudflare.com/api/users', {
+    axios.post(`${BASE_URL}/api/users`, {
         name: values.name,
         email: values.email,
         password: values.password
     })
         .then(response => {
-            console.log(response.status)
-            navigation.navigate("Main")
+            navigation.navigate("SignIn")
         })
         .catch(error => {
             Alert.alert(
@@ -108,6 +107,7 @@ function handleSignUp(values, navigation) {
                     },
                 ],
             );
+            console.log(error)
         });
 }
 
@@ -129,13 +129,7 @@ let schema = yup.object().shape({
         oneOf([yup.ref('password'), null], 'Passwords must match')
 })
 
-const SignIn = ({ navigation }) => {
-
-    // const [name, setName] = useState('');
-    // const [email, setEmail] = useState('');
-    // const [password, setPassword] = useState('');
-    // const [confirmPassword, setConfirmPassword] = useState('');
-
+const SignUp = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
@@ -220,4 +214,4 @@ const SignIn = ({ navigation }) => {
     )
 }
 
-export default SignIn
+export default SignUp
