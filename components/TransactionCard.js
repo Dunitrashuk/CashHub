@@ -19,12 +19,15 @@ const styles = StyleSheet.create({
         paddingRight: 15,
         height: 60,
         width: 350,
+
     },
 
     source: {
-        fontSize: 15,
+        fontSize: 12,
         color: "#D6D6D6",
-        fontWeight: "bold",
+        fontWeight: "400",
+        maxWidth: 210,
+        overflow: 'hidden'
     },
 
     amount: {
@@ -38,12 +41,41 @@ const styles = StyleSheet.create({
     }
 });
 
+function getCategoryIcon(category) {
+    switch (category) {
+        case "auto_and_transport":
+            return "car-outline"
+        case "bills_and_utilities":
+            return "reader-outline"
+        case "education":
+            return "school-outline"
+        case "entertainment":
+            return "color-palette-outline"
+        case "food_and_dining":
+            return "fast-food-outline"
+        case "health_and_fitness":
+            return "fitness-outline"
+        case "home":
+            return "home-outline"
+        case "income":
+            return "cash-outline"
+        case "shopping":
+            return "pricetag-outline"
+        case "travel":
+            return "map-outline"
+        default:
+            return "card-outline"
+    }
+}
+
 export default function TransactionCard(props) {
     let negative = (props.amount < 0) ? true : false;
+
+
     return (
         <TouchableOpacity style={styles.transactionCard}>
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                <Icon name={"card-outline"} size={20} color={"#D6D6D6"} />
+                <Icon name={getCategoryIcon(props.category)} size={20} color={"#D6D6D6"} />
                 <View style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 60, padding: 10 }}>
                     <Text style={styles.source}>{props.source}</Text>
                     <Text style={styles.date}>{props.date}</Text>
@@ -53,7 +85,7 @@ export default function TransactionCard(props) {
             <Text style={{
                 color: negative ? '#A73C3C' : '#7DA747', fontSize: 15,
                 fontWeight: 'semi-bold',
-            }}>{negative ? '' : '+'}{props.amount}$</Text>
+            }}>{negative ? '' : '+'}{props.amount} {props.currency}</Text>
 
         </TouchableOpacity >
     );

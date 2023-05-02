@@ -1,89 +1,16 @@
-import React from 'react';
-import { View, SafeAreaView, Text, Image, StyleSheet, Dimensions, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, SafeAreaView, Text, Image, StyleSheet, TouchableOpacity, ScrollView, RefreshControl, Alert, Animated } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import TransactionCard from '../components/TransactionCard';
-
-
-const transactions = [
-    {
-        key: "1",
-        source: "UNICAFE",
-        date: "18 March 11:18",
-        amount: -6.49
-    },
-    {
-        key: "2",
-        source: "STALMA LUX SRL",
-        date: "18 March 11:18",
-        amount: 150
-    },
-    {
-        key: "3",
-        source: "LINELA SUPERMARKET",
-        date: "18 March 11:18",
-        amount: -107.98
-    },
-    {
-        key: "4",
-        source: "AMDARIS",
-        date: "18 March 11:18",
-        amount: 1950
-    },
-    {
-        key: "5",
-        source: "UNICAFE",
-        date: "18 March 11:18",
-        amount: -6.49
-    },
-    {
-        key: "6",
-        source: "STALMA LUX SRL",
-        date: "18 March 11:18",
-        amount: 150
-    },
-    {
-        key: "7",
-        source: "LINELA SUPERMARKET",
-        date: "18 March 11:18",
-        amount: -107.98
-    },
-    {
-        key: "8",
-        source: "AMDARIS",
-        date: "18 March 11:18",
-        amount: 1950
-    },
-    {
-        key: "9",
-        source: "AMDARIS",
-        date: "18 March 11:18",
-        amount: 1950
-    },
-    {
-        key: "10",
-        source: "UNICAFE",
-        date: "18 March 11:18",
-        amount: -6.49
-    },
-    {
-        key: "11",
-        source: "STALMA LUX SRL",
-        date: "18 March 11:18",
-        amount: 150
-    },
-    {
-        key: "12",
-        source: "LINELA SUPERMARKET",
-        date: "18 March 11:18",
-        amount: -107.98
-    },
-    {
-        key: "13",
-        source: "AMDARIS",
-        date: "18 March 11:18",
-        amount: 1950
-    }
-]
+import AccountTag from '../components/AccountTag';
+import { BASE_URL } from '@env'
+import Constants from 'expo-constants';
+import axios from 'axios';
+import SearchBar from '../components/SearchBar';
+import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
+import { selectUser } from '../redux/slices/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAccounts, setLastTransactions, setTransactions } from '../redux/slices/userSlice';
 
 const styles = StyleSheet.create({
     top: {
@@ -91,19 +18,28 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent"
     },
     mainContainer: {
+        display: "flex",
         flex: 1,
         backgroundColor: "#1A1A1A",
     },
     transactionsContainer: {
-        height: Dimensions.get('window').height / 1.55,
+        height: 520,
         marginLeft: 20,
         marginRight: 20,
         width: 350,
         backgroundColor: '#272727',
         borderRadius: 15,
         paddingBottom: 10,
-        paddingTop: 10
+        paddingTop: 10,
+
     },
+
+    tagsContainer: {
+        backgroundColor: 'transparent',
+        paddingBottom: 10,
+        paddingTop: 10,
+    },
+
     logo: {
         resizeMode: "contain",
         alignSelf: 'center',
@@ -121,37 +57,208 @@ const styles = StyleSheet.create({
         height: 40,
         marginLeft: 20,
         marginRight: 20,
-        marginBottom: 20,
         padding: 10,
         color: "white",
         borderRadius: 10,
         backgroundColor: "#272727"
-    }
+    },
+    accountTag: {
+        display: "flex",
+        alignItems: "center",
+        marginLeft: 10,
+        height: 35,
+        backgroundColor: 'grey',
+        borderRadius: 10,
+        padding: 10
+    },
+
+    clickedTag: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginLeft: 10,
+        height: 35,
+        backgroundColor: '#404040',
+        borderRadius: 10,
+        padding: 10
+    },
+
+    name: {
+        fontSize: 12,
+        fontWeight: "300",
+    },
 });
 
+function fetchAccounts(setTabAccounts) {
+    let tabAccounts = useSelector(selectUser).accounts;
+    setTabAccounts(tabAccounts)
+};
+
+function fetchTransactions(dispatch, account_id = "") {
+    axios.get(`${BASE_URL}/api/transactions/`, {
+        params: {
+            account_id: account_id
+        },
+        headers: {
+            authorization: Constants.manifest.extra.TOKEN
+        },
+    }).then(response => {
+        let data = response.data;
+        dispatch(setTransactions({
+            transactions: data
+        }))
+    })
+        .catch(error => {
+            Alert.alert(
+                'Error',
+                'Could not connect to API',
+                [
+                    {
+                        text: 'Try Again',
+                        style: 'cancel',
+                    },
+                ],
+            );
+            console.log(error)
+        })
+};
+
+function fetchSearchedTransactions(dispatch, searchPhrase, account_id) {
+    axios.get(`${BASE_URL}/api/transactions/search`, {
+        params: {
+            account_id: account_id,
+            query: searchPhrase
+        },
+        headers: {
+            authorization: Constants.manifest.extra.TOKEN
+        },
+    }).then(response => {
+        let data = response.data;
+        dispatch(setTransactions({
+            transactions: data
+        }))
+        console.log(response)
+
+    })
+        .catch(error => {
+            Alert.alert(
+                'Error',
+                'Could not connect to API',
+                [
+                    {
+                        text: 'Try Again',
+                        style: 'cancel',
+                    },
+                ],
+            );
+            console.log(error)
+        })
+}
+
+
 export default function Transactions() {
+    const accounts = useSelector(selectUser).accounts;
+    const transactions = useSelector(selectUser).transactions;
+
+    const [refreshing, setRefreshing] = React.useState(false);
+    const [clickedAccount, setClickedAccount] = useState("");
+    const [lastSearched, setLastSearch] = useState("");
+
+    const dispatch = useDispatch();
+
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        setClickedAccount("")
+        fetchTransactions(dispatch, clickedAccount);
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000);
+    }, []);
+
+    useEffect(() => {
+        fetchTransactions(dispatch)
+    }, [accounts])
+
     return (
-        <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.top}>
-                <Image style={styles.logo} source={require('../assets/cashhub.png')} />
-            </View>
+        (accounts.length !== 0) ? (
 
-            <View style={{ display: "flex", flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                <Text style={styles.title}>Transactions</Text>
-            </View>
-            <TextInput style={styles.searchBar}></TextInput>
+            <SafeAreaView style={styles.mainContainer}>
+                <ScrollView refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }>
+                    <View style={styles.top}>
+                        <Image style={styles.logo} source={require('../assets/cashhub.png')} />
+                    </View>
 
-            <View style={styles.transactionsContainer}>
-                <FlatList
-                    data={transactions}
-                    keyExtractor={(item => item.key)}
-                    scrollEventThrottle="fast"
-                    decelerationRate='fast'
-                    renderItem={({ item }) => {
-                        return <TransactionCard source={item.source} date={item.date} amount={item.amount} />
-                    }}
-                />
-            </View>
-        </SafeAreaView>
+                    <Text style={styles.title}>Transactions</Text>
+
+                    <SearchBar
+                        account_id={clickedAccount}
+                        fetch={fetchSearchedTransactions}
+                        lastSearched={lastSearched}
+                        setLastSearch={setLastSearch}
+                    />
+
+
+                    <View style={styles.tagsContainer}>
+                        <FlatList
+                            data={accounts}
+                            keyExtractor={(item => item.id)}
+                            scrollEventThrottle="fast"
+                            decelerationRate='fast'
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) => {
+                                return (
+                                    <Pressable
+                                        style={(clickedAccount === item.id) ? styles.clickedTag : styles.accountTag}
+                                        onPress={() => {
+                                            setClickedAccount(item.id)
+                                            fetchTransactions(dispatch, item.id)
+                                        }}>
+                                        <Text style={styles.name}>{item.name}</Text>
+                                    </Pressable>)
+                            }}
+                            ListHeaderComponent={() => {
+                                return (
+                                    <Pressable key="All" style={(clickedAccount === "") ? styles.clickedTag : styles.accountTag}
+                                        onPress={() => {
+                                            setClickedAccount("")
+                                            fetchTransactions(dispatch)
+                                        }
+                                        }>
+                                        <Text style={styles.name}>All</Text>
+                                    </Pressable>)
+                            }}
+                        />
+                    </View>
+
+
+                    <Animated.View style={styles.transactionsContainer}>
+                        <FlatList
+                            data={transactions}
+                            keyExtractor={(item => item.id)}
+                            scrollEventThrottle="fast"
+                            decelerationRate='fast'
+                            renderItem={({ item }) => {
+                                return <TransactionCard source={item.description} date={item.made_on} amount={item.amount} category={item.category} currency={item.currency_code} />
+                            }}
+                        />
+                    </Animated.View>
+                </ScrollView>
+            </SafeAreaView >)
+            : (
+                <SafeAreaView style={styles.mainContainer}>
+                    <View style={styles.top}>
+                        <Image style={styles.logo} source={require('../assets/cashhub.png')} />
+                    </View>
+
+                    <View style={{ display: "flex", flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        <Text style={styles.title}>Transactions</Text>
+                    </View>
+                    <Text style={{ fontSize: 14, color: "grey", marginLeft: 20 }}>Add bank account first, to see transactions details</Text>
+                </SafeAreaView>
+            )
     );
 }
