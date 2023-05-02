@@ -1,6 +1,6 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 
 const styles = StyleSheet.create({
@@ -44,11 +44,13 @@ const styles = StyleSheet.create({
 
 export default function TransactionCard(props) {
     let onTrack = true;
+    let navigation = useNavigation();
+
     return (
         <View>
             <View style={{ display: "flex", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text style={styles.title}>Budget Plan</Text>
-                <Text style={styles.seeMore}>See More</Text>
+                <Text style={styles.seeMore} onPress={() => navigation.navigate("Budget")}>See More</Text>
             </View>
 
             <View style={styles.miniBudgetPlanContainer}>

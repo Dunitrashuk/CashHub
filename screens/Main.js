@@ -30,12 +30,6 @@ export default function Main({ navigation }) {
                         } else if (rn === "Transactions") {
                             iconName = focused ? 'list' : 'list-outline'
                         }
-                        // } else if (rn === forecastName) {
-                        //     iconName = focused ? 'forecast' : 'forecast-outline'
-                        // } else if (rn === budgetName) {
-                        //     iconName = focused ? 'budget' : 'budget-outline'
-                        // }
-
                         return <Ioicons name={iconName} size={size} color={color} />
                     }
                 })}
