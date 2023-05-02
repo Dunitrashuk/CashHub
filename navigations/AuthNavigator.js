@@ -8,13 +8,13 @@ import SignUp from '../screens/SignUp';
 const Stack = createStackNavigator();
 
 export default function AuthNavigator() {
-
     return (
-        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Landing">
+        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Landing'>
             <Stack.Screen name="Landing" component={Landing} />
             <Stack.Screen name="SignIn" component={SignIn} />
             <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="Main" component={BottomTabNavigator} />
+            {/* <Stack.Screen name="Loading" component={LoadingScreen} /> */}
         </Stack.Navigator>
     );
 }

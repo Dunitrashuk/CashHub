@@ -11,7 +11,7 @@ const Tab = createBottomTabNavigator();
 
 const styles = StyleSheet.create({
     tabBarStyle: {
-        backgroundColor: "rgba(217, 217, 217, 0.15)",
+        backgroundColor: "rgba(72, 72, 72, 1)",
         position: "absolute",
         borderRadius: 20,
         borderTopWidth: 0,
@@ -19,24 +19,24 @@ const styles = StyleSheet.create({
     }
 });
 
+
 export default function BottomTabNativator() {
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarShowLabel: false,
-                // tabBarInactiveTintColor: "#00000",
                 tabBarStyle: styles.tabBarStyle,
                 tabBarActiveTintColor: "#7DA747",
-                tabBarIcon: ({ color, size, focused }) => {
+                tabBarIcon: ({ color, focused }) => {
                     let iconName;
 
                     if (route.name === "Home") {
                         iconName = focused ? 'ios-home' : 'ios-home-outline';
                     } else if (route.name === "Transactions") {
-                        iconName = focused ? 'document' : 'document-outline';
+                        iconName = focused ? 'receipt' : 'receipt-outline';
                     } else if (route.name === "Forecasting") {
-                        iconName = focused ? 'bar-chart' : 'bar-chart-outline';
+                        iconName = focused ? 'podium' : 'podium-outline';
                     } else if (route.name === "Budget") {
                         iconName = focused ? 'wallet' : 'wallet-outline';
                     }
