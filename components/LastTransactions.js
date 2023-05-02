@@ -1,61 +1,8 @@
 import React from 'react';
-import { View, SafeAreaView, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import AccountCard from './AccountCard';
-import Icon from 'react-native-vector-icons/Ionicons';
 import TransactionCard from '../components/TransactionCard';
-
-
-const transactions = [
-    {
-        key: "1",
-        source: "UNICAFE",
-        date: "18 March 11:18",
-        amount: -6.49
-    },
-    {
-        key: "2",
-        source: "STALMA LUX SRL",
-        date: "18 March 11:18",
-        amount: 150
-    },
-    {
-        key: "3",
-        source: "LINELA SUPERMARKET",
-        date: "18 March 11:18",
-        amount: -107.98
-    },
-    {
-        key: "4",
-        source: "AMDARIS",
-        date: "18 March 11:18",
-        amount: 1950
-    },
-    {
-        key: "5",
-        source: "UNICAFE",
-        date: "18 March 11:18",
-        amount: -6.49
-    },
-    {
-        key: "6",
-        source: "STALMA LUX SRL",
-        date: "18 March 11:18",
-        amount: 150
-    },
-    {
-        key: "7",
-        source: "LINELA SUPERMARKET",
-        date: "18 March 11:18",
-        amount: -107.98
-    },
-    {
-        key: "8",
-        source: "AMDARIS",
-        date: "18 March 11:18",
-        amount: 1950
-    }
-]
+import { useNavigation } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
     title: {
@@ -88,21 +35,23 @@ const styles = StyleSheet.create({
 
 });
 
-export default function Accounts(props) {
+export default function LastTransactions(props) {
+    const navigation = useNavigation();
+
     return (
         <View>
             <View style={{ display: "flex", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text style={styles.title}>Last Transactions</Text>
-                <Text style={styles.seeMore}>See More</Text>
+                <Text style={styles.seeMore} onPress={() => navigation.navigate("Transactions")}>See More</Text>
             </View>
             <View style={styles.transactionsContainer}>
                 <FlatList
-                    data={transactions}
-                    keyExtractor={(item => item.key)}
+                    data={props.data}
+                    keyExtractor={(item => item.id)}
                     scrollEventThrottle="fast"
                     decelerationRate='fast'
                     renderItem={({ item }) => {
-                        return <TransactionCard source={item.source} date={item.date} amount={item.amount} />
+                        return <TransactionCard source={item.description} date={item.made_on} amount={item.amount} category={item.category} currency={item.currency_code} />
                     }}
                 />
             </View>
