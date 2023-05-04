@@ -108,8 +108,7 @@ function handleSignIn(values, navigation, dispatch) {
                 email: values.email,
                 isSignedIn: true
             }))
-            console.log(response)
-            navigation.navigate("Main")
+            // console.log(response)
         })
         .catch(error => {
             Alert.alert(
