@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import AccountCard from './AccountCard';
 import AddBankAccount from './AddBankAccount';
@@ -14,23 +14,16 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         fontWeight: "bold",
     },
-
-    addAccountButton: {
-        display: "flex",
-        marginLeft: 20,
-        height: 130,
-        width: 50,
-        backgroundColor: 'rgba(255, 255, 255, 1)',
-        opacity: 0.5,
-        borderRadius: 15,
-    },
-
 });
 
 const { width } = Dimensions.get('window');
 
 
 export default function Accounts(props) {
+
+    const [clickedAccount, setClickedAccount] = useState('0');
+
+
     return (
         <View>
             <Text style={styles.title}>Accounts</Text>
@@ -45,7 +38,7 @@ export default function Accounts(props) {
                 scrollEventThrottle="fast"
                 decelerationRate='fast'
                 renderItem={({ item }) => {
-                    return <AccountCard name={item.name} balance={item.balance} currency_code={item.currency_code} nature={item.nature} />
+                    return <AccountCard name={item.name} balance={item.balance} currency_code={item.currency_code} nature={item.nature} account_id={item.id} clicked_account={clickedAccount} setClickedAccount={setClickedAccount} />
                 }}
                 ListFooterComponent={() => <AddBankAccount />}
             />

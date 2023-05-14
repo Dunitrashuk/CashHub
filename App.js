@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import { store } from './redux/store';
 
 export default function App() {
-  console.log(store.getState())
+  // console.log(store.getState())
   return (
     <Provider store={store}>
       <NavigationContainer>

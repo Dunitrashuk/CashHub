@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, SafeAreaView, Text, Image, StyleSheet, TouchableOpacity, ScrollView, RefreshControl, Alert, Animated } from 'react-native';
+import { View, SafeAreaView, Text, Image, StyleSheet, ScrollView, RefreshControl, Alert, Animated } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import TransactionCard from '../components/TransactionCard';
 import AccountTag from '../components/AccountTag';
@@ -11,6 +11,7 @@ import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 import { selectUser } from '../redux/slices/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAccounts, setLastTransactions, setTransactions } from '../redux/slices/userSlice';
+import TopBar from '../components/TopBar';
 
 const styles = StyleSheet.create({
     top: {
@@ -89,11 +90,6 @@ const styles = StyleSheet.create({
     },
 });
 
-function fetchAccounts(setTabAccounts) {
-    let tabAccounts = useSelector(selectUser).accounts;
-    setTabAccounts(tabAccounts)
-};
-
 function fetchTransactions(dispatch, account_id = "") {
     axios.get(`${BASE_URL}/api/transactions/`, {
         params: {
@@ -103,7 +99,7 @@ function fetchTransactions(dispatch, account_id = "") {
             authorization: Constants.manifest.extra.TOKEN
         },
     }).then(response => {
-        let data = response.data;
+        let data = response.data.data;
         dispatch(setTransactions({
             transactions: data
         }))
@@ -133,11 +129,11 @@ function fetchSearchedTransactions(dispatch, searchPhrase, account_id) {
             authorization: Constants.manifest.extra.TOKEN
         },
     }).then(response => {
-        let data = response.data;
+        let data = response.data.data;
         dispatch(setTransactions({
             transactions: data
         }))
-        console.log(response)
+        // console.log(response)
 
     })
         .catch(error => {
@@ -161,7 +157,7 @@ export default function Transactions() {
     const transactions = useSelector(selectUser).transactions;
 
     const [refreshing, setRefreshing] = React.useState(false);
-    const [clickedAccount, setClickedAccount] = useState("");
+    const [clickedAccount, setClickedAccount] = useState('0');
     const [lastSearched, setLastSearch] = useState("");
 
     const dispatch = useDispatch();
@@ -169,7 +165,7 @@ export default function Transactions() {
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        setClickedAccount("")
+        setClickedAccount('0')
         fetchTransactions(dispatch, clickedAccount);
         setTimeout(() => {
             setRefreshing(false);
@@ -187,9 +183,7 @@ export default function Transactions() {
                 <ScrollView refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }>
-                    <View style={styles.top}>
-                        <Image style={styles.logo} source={require('../assets/cashhub.png')} />
-                    </View>
+                    <TopBar />
 
                     <Text style={styles.title}>Transactions</Text>
 
@@ -220,17 +214,17 @@ export default function Transactions() {
                                         <Text style={styles.name}>{item.name}</Text>
                                     </Pressable>)
                             }}
-                            ListHeaderComponent={() => {
-                                return (
-                                    <Pressable key="All" style={(clickedAccount === "") ? styles.clickedTag : styles.accountTag}
-                                        onPress={() => {
-                                            setClickedAccount("")
-                                            fetchTransactions(dispatch)
-                                        }
-                                        }>
-                                        <Text style={styles.name}>All</Text>
-                                    </Pressable>)
-                            }}
+                        // ListHeaderComponent={() => {
+                        //     return (
+                        //         <Pressable key="All" style={(clickedAccount === "") ? styles.clickedTag : styles.accountTag}
+                        //             onPress={() => {
+                        //                 setClickedAccount("")
+                        //                 fetchTransactions(dispatch)
+                        //             }
+                        //             }>
+                        //             <Text style={styles.name}>All</Text>
+                        //         </Pressable>)
+                        // }}
                         />
                     </View>
 
@@ -250,9 +244,7 @@ export default function Transactions() {
             </SafeAreaView >)
             : (
                 <SafeAreaView style={styles.mainContainer}>
-                    <View style={styles.top}>
-                        <Image style={styles.logo} source={require('../assets/cashhub.png')} />
-                    </View>
+                    <TopBar />
 
                     <View style={{ display: "flex", flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <Text style={styles.title}>Transactions</Text>

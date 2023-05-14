@@ -23,15 +23,15 @@ const styles = StyleSheet.create({
     },
 
     source: {
-        fontSize: 12,
+        fontSize: 11,
         color: "#D6D6D6",
         fontWeight: "400",
-        maxWidth: 210,
+        maxWidth: 200,
         overflow: 'hidden'
     },
 
     amount: {
-        fontSize: 15,
+        fontSize: 12,
         fontWeight: 'bold',
     },
 
@@ -70,7 +70,7 @@ function getCategoryIcon(category) {
 
 export default function TransactionCard(props) {
     let negative = (props.amount < 0) ? true : false;
-
+    let amount = parseFloat(props.amount).toFixed(2) + ""
 
     return (
         <TouchableOpacity style={styles.transactionCard}>
@@ -83,9 +83,9 @@ export default function TransactionCard(props) {
             </View>
 
             <Text style={{
-                color: negative ? '#A73C3C' : '#7DA747', fontSize: 15,
+                color: negative ? '#A73C3C' : '#7DA747', fontSize: 12,
                 fontWeight: 'semi-bold',
-            }}>{negative ? '' : '+'}{props.amount} {props.currency}</Text>
+            }}>{negative ? '' : '+'}{amount} {props.currency}</Text>
 
         </TouchableOpacity >
     );

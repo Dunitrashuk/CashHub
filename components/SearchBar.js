@@ -1,8 +1,8 @@
 import React from 'react'
 import { useState } from 'react';
-import { Feather, Entypo } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { StyleSheet, TextInput, View, Keyboard, Button } from "react-native";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 
 const styles = StyleSheet.create({
@@ -73,14 +73,12 @@ function SearchBar({ account_id, fetch, lastSearched, setLastSearch }) {
                         : styles.searchBar__unclicked
                 }
             >
-                {/* search Icon */}
                 <Feather
                     name="search"
                     size={20}
                     color="grey"
                     style={{ marginLeft: 1 }}
                 />
-                {/* Input field */}
                 <TextInput
                     style={styles.input}
                     placeholder="Search"
@@ -92,10 +90,7 @@ function SearchBar({ account_id, fetch, lastSearched, setLastSearch }) {
                     }}
 
                 />
-
-
             </View>
-            {/* cancel button, depending on whether the search bar is clicked or not */}
             {clicked && (
                 <View>
                     <Button

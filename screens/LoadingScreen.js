@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
 
 export default function LoadingScreen() {
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#1A1A1A" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#1A1A1A", zIndex: 2 }}>
             <View style={styles.logoContainer}>
                 <Text style={styles.logo}>cashhub</Text>
             </View >

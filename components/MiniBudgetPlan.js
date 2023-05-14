@@ -14,9 +14,10 @@ const styles = StyleSheet.create({
     },
 
     miniBudgetPlanContainer: {
-        height: 100,
+        height: 115,
         marginLeft: 20,
         marginRight: 20,
+        marginBottom: 15,
         width: 350,
         backgroundColor: '#272727',
         borderRadius: 15,
@@ -42,9 +43,10 @@ const styles = StyleSheet.create({
 });
 
 
-export default function TransactionCard(props) {
-    let onTrack = true;
+export default function MiniBudgetPlan(props) {
+    let onTrack = (parseFloat(props.goal) > parseFloat(props.spent)) ? true : false
     let navigation = useNavigation();
+    const percentage = 100 * parseInt(props.spent) / parseInt(props.goal);
 
     return (
         <View>
@@ -55,19 +57,26 @@ export default function TransactionCard(props) {
 
             <View style={styles.miniBudgetPlanContainer}>
                 <View>
+                    {/* <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 14, color: '#D6D6D6', fontWeight: 'bold' }}>Account: </Text>
+                        <Text style={{ fontSize: 14, color: '#ffffff' }}>{props.account}</Text>
+                    </View> */}
                     <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 14, color: '#D6D6D6', fontWeight: 'bold' }}>Monthly Plan:  </Text>
-                        <Text style={{ fontSize: 14, color: onTrack ? '#7DA747' : '#A73C3C' }}>2000$</Text>
+                        <Text style={{ fontSize: 14, color: '#D6D6D6', fontWeight: 'bold' }}>Monthly Plan: </Text>
+                        <Text style={{ fontSize: 14, color: onTrack ? '#7DA747' : '#A73C3C' }}>{props.goal} {props.currencyCode}</Text>
+                    </View>
+
+                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 14, color: '#D6D6D6', fontWeight: 'bold' }}>Spent:  </Text>
+                        <Text style={{ fontSize: 14, color: onTrack ? '#7DA747' : '#A73C3C' }}>{props.spent} {props.currencyCode}</Text>
                     </View>
 
                     <Text style={{ fontSize: 11, color: '#818181', marginTop: 15 }}>{(onTrack) ? 'You are on track' : 'You exceeded monthly plan'}</Text>
 
                     <View style={styles.budgetBar}>
-                        <Animated.View style={{ ...StyleSheet.absoluteFill, backgroundColor: onTrack ? '#7DA747' : '#A73C3C', width: onTrack ? '65%' : '100%' }} />
+                        <Animated.View style={{ ...StyleSheet.absoluteFill, backgroundColor: onTrack ? '#7DA747' : '#A73C3C', width: onTrack ? `${percentage}%` : '100%' }} />
                     </View>
                 </View>
-
-
 
             </View>
         </View>

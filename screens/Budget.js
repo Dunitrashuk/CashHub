@@ -1,13 +1,15 @@
-import React from 'react';
-import { View, SafeAreaView, Text, Image, StyleSheet, Dimensions, Animated } from 'react-native';
-import {
-    LineChart,
-    BarChart,
-    PieChart,
-    ProgressChart,
-    ContributionGraph,
-    StackedBarChart,
-} from 'react-native-chart-kit';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Alert, SafeAreaView, Text, StyleSheet, Dimensions, Animated, FlatList } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser, setBudgetPlans } from '../redux/slices/userSlice';
+import { useState } from 'react';
+import { BASE_URL } from '@env'
+import axios from 'axios';
+import Constants from 'expo-constants';
+import TopBar from '../components/TopBar';
+import BudgetPlan from '../components/BudgetPlan'
+import CreateBudgetPlanButton from '../components/CreateBudgetPlanButton';
+import CreateBudgetPlanModal from '../components/CreateBudgetPlanModal';
 
 
 const styles = StyleSheet.create({
@@ -51,57 +53,71 @@ const styles = StyleSheet.create({
 
 });
 
-export default function Budget({ navigation }) {
-    let onTrack = true;
+async function getBudgetPlans(dispatch) {
+    axios.get(`${BASE_URL}/api/budget`, {
+        headers: {
+            authorization: Constants.manifest.extra.TOKEN
+        }
+    }).then(response => {
+        let data = response.data;
+        dispatch(setBudgetPlans({
+            budgetPlans: data
+        }
+        ))
+    })
+        .catch(error => {
+            Alert.alert(
+                'Error',
+                'Could not connect to API',
+                [
+                    {
+                        text: 'Try Again',
+                        style: 'cancel',
+                    },
+                ],
+            );
+            console.log(error)
+        })
+}
 
+
+export default function Budget() {
+    const accounts = useSelector(selectUser).accounts;
+    const budgetPlans = useSelector(selectUser).budgetPlans;
+
+    const [visible, setVisible] = useState(false);
+    const dispatch = useDispatch();
+
+
+    useEffect(() => {
+        getBudgetPlans(dispatch)
+    }, [])
 
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.top}>
-                <Image style={styles.logo} source={require('../assets/cashhub.png')} />
-            </View>
-            <Text style={styles.title}>Budget</Text>
+            <TopBar />
+            <Text style={styles.title}>Budget Plans</Text>
 
-            <View style={styles.miniBudgetPlanContainer}>
-                <View>
-                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 14, color: '#D6D6D6', fontWeight: 'bold' }}>Monthly Plan:  </Text>
-                        <Text style={{ fontSize: 14, color: onTrack ? '#7DA747' : '#A73C3C' }}>2000$</Text>
-                    </View>
+            <CreateBudgetPlanModal visible={visible} setVisible={setVisible} />
 
-                    <Text style={{ fontSize: 11, color: '#818181', marginTop: 15 }}>{(onTrack) ? 'You are on track' : 'You exceeded monthly plan'}</Text>
+            {(accounts.length !== 0) ?
+                <FlatList
+                    data={budgetPlans}
+                    keyExtractor={(item => item.id)}
+                    scrollEventThrottle="fast"
+                    decelerationRate='fast'
+                    renderItem={({ item }) => {
+                        const percentage = 100 * parseInt(item.spent) / parseInt(item.goal);
+                        return <BudgetPlan account={item.account_name} goal={item.goal} spent={item.spent} percentage={percentage} currencyCode={item.currency_code} budgetId={item.id} />
 
-                    <View style={styles.budgetBar}>
-                        <Animated.View style={{ ...StyleSheet.absoluteFill, backgroundColor: onTrack ? '#7DA747' : '#A73C3C', width: onTrack ? '65%' : '100%' }} />
-                    </View>
-                </View>
+                    }}
+                    ListFooterComponent={() => <CreateBudgetPlanButton setVisible={setVisible} />}
 
+                />
 
-
-            </View>
-
-            {/* <ProgressChart
-                data={[0.6]}
-                width={Dimensions.get('window').width - 40}
-                height={220}
-                strokeWidth={20}
-                radius={70}
-                chartConfig={{
-                    backgroundColor: '#272727',
-                    backgroundGradientFrom: '#eff3ff',
-                    backgroundGradientTo: '#efefef',
-                    decimalPlaces: 2,
-                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-
-                }}
-                style={{
-                    backgroundColor: '#272727',
-                    marginVertical: 8,
-                    borderRadius: 16,
-                    marginLeft: 20
-                }}
-            /> */}
-
+                :
+                <Text style={{ fontSize: 14, color: "grey", marginLeft: 20 }}>Add bank account first</Text>
+            }
         </SafeAreaView>
     );
 }

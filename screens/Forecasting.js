@@ -8,6 +8,7 @@ import {
     ContributionGraph,
     StackedBarChart,
 } from 'react-native-chart-kit';
+import TopBar from '../components/TopBar';
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -30,35 +31,38 @@ const styles = StyleSheet.create({
     },
 });
 
-export default function Forecasting({ navigation }) {
+export default function Forecasting() {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "#1A1A1A" }}>
-            <View style={styles.top}>
-                <Image style={styles.logo} source={require('../assets/cashhub.png')} />
-            </View>
+            <TopBar />
             <Text style={styles.title}>Forecasting</Text>
             <BarChart
                 data={{
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June'],
                     datasets: [
                         {
-                            data: [20, 45, 28, 80, 99, 43],
+                            data: [301, 666, 1560, 2040, 2595, 4673],
                         },
                     ],
                 }}
+                fromZero={true}
+                showValuesOnTopOfBars={true}
                 width={Dimensions.get('window').width - 40}
-                height={220}
+                height={250}
                 yAxisLabel={'$'}
                 chartConfig={{
-                    backgroundColor: '#1cc910',
-                    backgroundGradientFrom: '#eff3ff',
-                    backgroundGradientTo: '#efefef',
+                    backgroundGradientFrom: '#1A1A1A',
+                    backgroundGradientTo: '#1A1A1A',
+                    backgroundGradientToOpacity: 0.1,
                     decimalPlaces: 1,
-                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    color: () => '#BBBBBB',
                     style: {
-                        borderRadius: 16,
-                        padding: 20
+                        borderRadius: 100,
                     },
+                    fillShadowGradientFrom: '#A73C3C',
+                    fillShadowGradientTo: '#A73C3C',
+                    fillShadowGradientFromOpacity: .5,
+                    fillShadowGradientToOpacity: 0
                 }}
                 style={{
                     marginVertical: 20,

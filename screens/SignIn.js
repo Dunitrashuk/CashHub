@@ -96,7 +96,7 @@ let schema = yup.object().shape({
     password: yup.string().required("Password is required"),
 })
 
-function handleSignIn(values, navigation, dispatch) {
+function handleSignIn(values, dispatch) {
     axios.post(`${BASE_URL}/api/auth/sign_in`, {
         email: values.email,
         password: values.password
@@ -108,7 +108,7 @@ function handleSignIn(values, navigation, dispatch) {
                 email: values.email,
                 isSignedIn: true
             }))
-            // console.log(response)
+            console.log(response)
         })
         .catch(error => {
             Alert.alert(
@@ -141,7 +141,7 @@ const SignIn = ({ navigation }) => {
             <Formik
                 initialValues={{ email: "", password: "" }}
                 validateOnMount={true}
-                onSubmit={values => handleSignIn(values, navigation, dispatch)}
+                onSubmit={values => handleSignIn(values, dispatch)}
                 validationSchema={schema}
             >
 

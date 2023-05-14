@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import * as Linking from 'expo-linking';
@@ -22,9 +22,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
     }
 });
-
-const { width } = Dimensions.get('window');
-
 
 function addBankAccount() {
     axios.post(`${BASE_URL}/api/connect/connect`, {

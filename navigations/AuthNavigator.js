@@ -20,7 +20,6 @@ export default function AuthNavigator() {
                     <Stack.Screen name="SignUp" component={SignUp} />
                 </>
                 : <Stack.Screen name="Main" component={BottomTabNavigator} />}
-            {/* <Stack.Screen name="Loading" component={LoadingScreen} /> */}
         </Stack.Navigator>
     );
 }
